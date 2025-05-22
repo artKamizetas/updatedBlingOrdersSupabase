@@ -1,0 +1,64 @@
+import { z } from "https://deno.land/x/zod@v3.24.1/mod.ts";
+
+// Função para carregar e validar variáveis de ambiente com Zod
+const envSchema = z.object({
+  MY_SUPABASE_EMAIL: z.string(),
+  MY_SUPABASE_PASSWORD: z.string(),
+  MY_SUPABASE_URL: z.string().url(),
+  MY_SUPABASE_KEY: z.string(),
+  CODE_AUTH_BLING: z.string(),
+  URL_BASE_API_V3_BLING: z.string(),
+  CLIENTID_BLING: z.string(),
+  SECRET_KEY_BLING: z.string(),
+  CREDENCIALS: z.string(),
+});
+
+let validatedEnv;
+
+// Validar as variáveis de ambiente com Zod
+try {
+  validatedEnv = envSchema.parse({
+    MY_SUPABASE_EMAIL: Deno.env.get("MY_SUPABASE_EMAIL"),
+    MY_SUPABASE_PASSWORD: Deno.env.get("MY_SUPABASE_PASSWORD"),
+    MY_SUPABASE_URL: Deno.env.get("MY_SUPABASE_URL"),
+    MY_SUPABASE_KEY: Deno.env.get("MY_SUPABASE_KEY"),
+    CODE_AUTH_BLING: Deno.env.get("CODE_AUTH_BLING"),
+    URL_BASE_API_V3_BLING: Deno.env.get("URL_BASE_API_V3_BLING"),
+    CLIENTID_BLING: Deno.env.get("CLIENTID_BLING"),
+    SECRET_KEY_BLING: Deno.env.get("SECRET_KEY_BLING"),
+    CREDENCIALS: Deno.env.get("CREDENCIALS"),
+
+  });
+} catch (error) {
+  console.error("❌ Falha na validação das variáveis de ambiente:");
+  console.error(error.errors); 
+  Deno.exit(1); 
+}
+
+// Exportar as variáveis de ambiente validadas
+const {
+  MY_SUPABASE_EMAIL: supabaseEmail,
+  MY_SUPABASE_PASSWORD: supabasePassword,
+  MY_SUPABASE_URL: supabaseUrl,
+  MY_SUPABASE_KEY: supabaseKey,
+  CODE_AUTH_BLING: code_auth_bling,
+  URL_BASE_API_V3_BLING: urlBaseApiv3Bling,
+  CLIENTID_BLING: clientIdBling,
+  SECRET_KEY_BLING: secretKeyBling,
+  CREDENCIALS: credencials
+
+
+} = validatedEnv;
+
+export {
+  supabaseEmail,
+  supabasePassword,
+  supabaseUrl,
+  supabaseKey,
+  code_auth_bling,
+  urlBaseApiv3Bling,
+  clientIdBling,
+  secretKeyBling,
+  credencials
+
+};
