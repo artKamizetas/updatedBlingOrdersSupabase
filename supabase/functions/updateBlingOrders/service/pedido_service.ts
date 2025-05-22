@@ -86,33 +86,8 @@ class PedidoService {
 
   async update(pedido_bling: PedidoBlingApiPedidoById) {
     try {
-      const vendedor = await this.vendedorService.select(
-        pedido_bling.vendedor.id,
-      );
-
-      const client = await this.clientService.select(
-        pedido_bling.contato.id,
-      );
-
-      const status_venda = await this.statusVendasService.select(
-        pedido_bling.situacao.id,
-      );
-
-      const loja = await this.lojaService.select(pedido_bling.loja.id);
-      if (!loja) console.error("Loja nao encontrada");
-
-      const id_vendedor = vendedor?.id || null;
-
-      const id_client = client?.id || null;
-      const id_status_venda = status_venda?.id || null;
-      const id_loja = loja?.id || null;
-
-      const pedidoAtualizado = this.formatPedidoData(
+      const pedidoAtualizado = await this.formatPedidoData(
         pedido_bling,
-        id_vendedor,
-        id_client,
-        id_status_venda,
-        id_loja,
       );
       await this.db.update("pedidos", pedidoAtualizado, {
         numero: pedido_bling.numero,
@@ -127,7 +102,7 @@ class PedidoService {
 
   async create(pedido_bling: PedidoBlingApiPedidoById): Promise<string> {
     try {
-      const pedido = this.formatPedidoData(pedido_bling);
+      const pedido = await this.formatPedidoData(pedido_bling);
 
       await this.db.insert("pedidos", pedido);
 
@@ -166,13 +141,30 @@ class PedidoService {
     }
   }
 
-  formatPedidoData(
+  async formatPedidoData(
     pedido_bling: PedidoBlingApiPedidoById,
-    id_vendedor?: string | null,
-    id_client?: string | null,
-    id_status_venda?: string | null,
-    id_loja?: string | null,
-  ): ResquestPedidoSupabase {
+  ): Promise<ResquestPedidoSupabase>{
+    const vendedor = await this.vendedorService.select(
+      pedido_bling.vendedor.id,
+    );
+
+    const client = await this.clientService.select(
+      pedido_bling.contato.id,
+    );
+
+    const status_venda = await this.statusVendasService.select(
+      pedido_bling.situacao.id,
+    );
+
+    const loja = await this.lojaService.select(pedido_bling.loja.id);
+    if (!loja) console.error("Loja nao encontrada");
+
+    const id_vendedor = vendedor?.id || null;
+
+    const id_client = client?.id || null;
+    const id_status_venda = status_venda?.id || null;
+    const id_loja = loja?.id || null;
+    
     const dataPrevista = pedido_bling.dataPrevista === "0000-00-00"
       ? null
       : pedido_bling.dataPrevista;
@@ -197,8 +189,6 @@ class PedidoService {
       id_vendedor: id_vendedor,
       updated_at: new Date().toISOString(),
     };
-    console.log("Pedido formatado:", pedido);
-
     return pedido;
   }
 }
